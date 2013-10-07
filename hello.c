@@ -1,26 +1,38 @@
 #include <stdio.h>
 #include <inttypes.h>
 
-#define READ_COUNTER_ADDR 0x40050000
-
-int32_t *read_counter = (int32_t *) READ_COUNTER_ADDR;
 int main(void)
 {
-	printf("This is a test program for QEMU counter device\n");
-	printf("See http://github.com/krasin/qemu-counter for more details\n\n");
-	printf("Let's check if the Read Counter device presented\n");
-	for (int i = 0; i < 10; i++) {
-		printf("The device has been accessed for %"PRId32" times!\n", *read_counter);
-	}
-	int32_t now = *read_counter;
-	if (now == 0) {
-		printf("ERROR - No Read Counter detected\n");
-	}
-	else if (now == 11) {
-		printf("OK - Read Counter works as intended\n");
-	}
-	else {
-		printf("ERROR - Something is wrong with Read Counter\n");
-	}
-	return 0;
+    char buf[256];
+
+    FILE *fin = fopen( "read.txt", "r" );
+    if( !fin ) {
+        printf( "Error in open read file!!\n" );
+        return -1;
+    }
+
+    if( fgets( buf, 256, fin ) )
+        printf( "Read: %s\n", buf );
+    else
+        printf( "Error : Can't get ant string!!\n" );
+
+    fclose( fin );
+
+    /******************************************************/
+
+    char buf_write[] = "This is target\n";
+    FILE *fout = fopen( "write.txt", "w" );
+    if( !fout ) {
+        printf( "Error in open write file!!\n" );
+        return -1;
+    }
+
+    if( !fputs( buf_write, fout ) )
+        printf( "Write host file successful!!\n" );
+    else 
+        printf( "Error : Can't write to file\n" );
+
+    fclose( fout );
+
+    return 0;
 }
